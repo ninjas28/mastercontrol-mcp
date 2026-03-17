@@ -10,10 +10,12 @@ def main():
     parser.add_argument("--key", required=True, help="MasterControl API Key")
     parser.add_argument("--tenant", required=True, help="MasterControl Tenant")
     parser.add_argument("--data-dir", required=True, help="Directory to store downloaded files")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to bind the server to")
+    parser.add_argument("--port", type=int, default=3000, help="Port to bind the server to")
     args = parser.parse_args()
 
     mc = MasterControl(args.key, args.tenant, args.data_dir)
-    mcp = FastMCP("mastercontrol-mcp", key=args.key, tenant=args.tenant, data_dir=args.data_dir)
+    mcp = FastMCP("mastercontrol-mcp", host=args.host, port=args.port)
 
     mcp.add_tool(mc.get_infocard)
     mcp.add_tool(mc.get_file_from_infocard)
@@ -22,7 +24,7 @@ def main():
     mcp.add_tool(mc.download_file)
 
     try:
-        mcp.run()
+        mcp.run(transport="streamable-http")
     except Exception as e:
         logger.error(f"Error starting server: {str(e)}")
         raise
