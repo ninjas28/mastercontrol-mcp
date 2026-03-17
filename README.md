@@ -4,9 +4,65 @@ An MCP server for the Mastercontrol Document Management System (mastercontrol.co
 
 ## Features
 
-- **Retrieve metadata**: Get infocard information
-- **Get file name and contents**: Get the file as original or PDF, with Base64 file data
-- **Download file**: Save to your drive in a specified sandbox folder
+### Documents
+- **Infocard metadata**: Get infocard by document number or infocard ID, with extended details
+- **Revision navigation**: Get latest, released, next, or previous revision infocards
+- **Access rights**: Check user find rights and anonymous vault rights
+- **Main file retrieval**: Download main file (original or PDF) as Base64, or save to disk
+- **Published file variants**: Get published, altered-published, or modified-published PDFs as Base64
+- **File existence checks**: Check whether main, encrypted, or published main files exist
+- **Attachments**: List attachments or download a specific attachment as Base64
+- **Document links**: Get linked documents and their metadata
+
+### Document Types & Configuration
+- **Document types**: List all types, download templates, check if an infocard is a type
+- **Custom fields per type/subtype**: Get configured custom fields for types and subtypes
+- **Subtypes**: List subtypes under a parent document type
+- **Document settings**: Get global tenant document settings
+- **Vault change search**: Search for documents whose vault has changed, with date filtering and pagination
+
+### Custom Fields
+- **Portal custom fields**: List all custom fields and options for custom data fields
+- **Field values by revision**: Get custom field values for a document revision
+- **Field values by infocard ID**: Get all custom field values for a document
+
+### Data Structures
+- **List structures**: List all data structures or checklist data structures
+- **Retrieve rows**: Get all rows, filtered rows, or a single row from a data structure
+- **Paginated access**: Page through large data structures with optional type/query filters
+- **Metadata**: Get access rights, total row count, or the next auto-generated number
+
+### Folders / Explorer
+- **Root folder tree**: Get the top-level document explorer structure
+- **Taxonomy folders**: Browse taxonomy folder contents by ID and path
+- **Static & virtual folders**: Get contents of static or virtual folders
+- **Export**: Export a folder as a downloadable archive (Base64)
+
+### Forms
+- **Form metadata**: Get form infocard by form number/revision or infocard ID
+- **Attachments & links**: List attachments, download attachments, get linked documents and metadata
+- **Web links**: Get web links attached to a form
+- **Workflows**: List all or only enabled form workflow definitions
+- **Form status**: Get current workflow task/status for a form
+- **Published PDFs**: Download modified-published or published infocard PDFs as Base64
+
+### Portal Administration
+- **Current user**: Get the authenticated user's profile
+- **Application rights**: Query portal application rights with optional filtering and pagination
+- **Business units**: List all business units, get a user's business units, get roles per unit
+- **Roles**: List all roles, get role members, get a user's roles or interactable roles
+- **Vaults**: List all vaults and get publishing settings per vault
+- **Lifecycles**: List all document lifecycle definitions
+- **Coversheets**: List available publishing coversheets
+
+### Suppliers & Registrations
+- **Suppliers**: List all suppliers, get a specific supplier, and list their supplied items
+- **Supplied items**: List all supplied items and get their associated suppliers
+- **Registrations**: List all registrations or get a specific registration
+
+### SCIM & Licenses
+- **SCIM users**: List or get users via the SCIM v0 API, with filtering and pagination
+- **Third-party licenses**: Retrieve open-source license information used by MasterControl
 
 ## Installation
 
@@ -21,7 +77,7 @@ Where [tenant] is the name of your company. Peek at the browser address bar when
 ### Manual Installation
 ```bash
 # Clone the repository
-git clone https://github.com/morsm/mastercontrol-mcp.git
+git clone https://github.com/ninjas28/mastercontrol-mcp.git
 cd mastercontrol-mcp
 
 # Install dependencies
@@ -35,17 +91,18 @@ uv pip install -e .
 Start the MCP server:
 
 ```bash
-startServer.sh --tenant mycompany --key mykey --data-dir /Users/me/Agents/files
+uv run server.py --tenant mycompany --key mykey --data-dir /Users/me/Agents/files
 ```
 
 Configuration for Claude Desktop:
-```claude_desktop_config.json
+```json
     "mastercontrol-mcp": {
-      "command": "/Users/me/Agents/servers/mastercontrol-mcp/startServer.sh",
-      "args": ["--tenant", "mycompany", "--key", "mykey", "--data-dir", "/Users/me/Agents/files"],
+      "command": "uv",
+      "args": ["run", "server.py", "--tenant", "mycompany", "--key", "mykey", "--data-dir", "/Users/me/Agents/files"],
       "cwd": "/Users/me/Agents/servers/mastercontrol-mcp"
-    } 
+    }
 ```
+For other configurations, start the MCP server and then setup a streamable-http connection from your LLM to the server at /mcp.
 
 ## Development
 
