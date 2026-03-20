@@ -480,6 +480,12 @@ class MasterControl:
         data_raw, _ = self.get("/portal/roles")
         return json.loads(data_raw)
 
+    def get_user_username(self, userId):
+        """Get username of user from ID."""
+        data_raw, _ = self.get(f"/users/{userId}/interactable-roles")
+        user_interactable_roles = json.loads(data_raw)
+        return user_interactable_roles["username"]
+
     def get_role_members(self, name):
         """Get all users assigned to a specific role by role name."""
         data_raw, _ = self.get(f"/portal/roles/{name}/users")
