@@ -4,6 +4,7 @@ import json
 import re
 import os
 from urllib.parse import urlencode
+import pymupdf
 
 class MasterControl:
     def __init__(self, key, tenant, data_dir):
@@ -47,13 +48,18 @@ class MasterControl:
             return None, None
         
         content_disposition = headers.get('Content-Disposition')
+        filename = None
         if content_disposition:
             match = re.match(r'attachment\s*;\s*filename="(.*)"\s*', content_disposition)
             if match:
                 filename = match.group(1)
-                return filename, base64.b64encode(mainfile).decode('utf-8')
-        
-        return None, base64.b64encode(mainfile).decode('utf-8')
+        is_pdf = (filename and filename.lower().endswith('.pdf')) or mainfile[:4] == b'%PDF'
+        if is_pdf:
+            doc = pymupdf.open(stream=mainfile, filetype='pdf')
+            text = '\n\n'.join(page.get_text() for page in doc)
+            doc.close()
+            return filename, text
+        return filename, base64.b64encode(mainfile).decode('utf-8')
 
     def get_file_and_infocard(self, docid, revision=None, pdf=True):
         """Get both the main file and the infocard metadata for a document in one call. Returns (filename, base64-encoded content, infocard dict)."""
@@ -132,6 +138,12 @@ class MasterControl:
             match = re.match(r'attachment\s*;\s*filename="(.*)"\s*', content_disposition)
             if match:
                 filename = match.group(1)
+        is_pdf = (filename and filename.lower().endswith('.pdf')) or data_raw[:4] == b'%PDF'
+        if is_pdf:
+            doc = pymupdf.open(stream=data_raw, filetype='pdf')
+            text = '\n\n'.join(page.get_text() for page in doc)
+            doc.close()
+            return filename, text
         return filename, base64.b64encode(data_raw).decode('utf-8')
 
     def get_published_main_file(self, infoCardId):
